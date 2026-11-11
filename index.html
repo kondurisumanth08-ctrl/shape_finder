@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shapes Around Us – Mia’s Shape Adventure</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--ink:#2b2350;--accent:#ff7a59;--teal:#2a9d8f;--yellow:#ffb703;--pink:#ff8fab;--purple:#7b5cd6}
+body{font-family:'Comic Sans MS','Chalkboard SE','Baloo 2',cursive;background:linear-gradient(180deg,#aee9ff 0%,#d8f7ff 55%,#fff3c4 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;color:var(--ink)}
+.book{width:100%;max-width:880px;background:#fff;border-radius:30px;overflow:hidden;border:6px solid var(--yellow);box-shadow:0 16px 50px rgba(30,60,120,.3);display:flex;flex-direction:column}
+header{background:linear-gradient(90deg,var(--pink),var(--yellow));padding:14px 20px;text-align:center;color:#fff;position:relative}
+header h1{font-size:clamp(1.3rem,4vw,1.8rem);text-shadow:2px 2px 0 rgba(0,0,0,.12)}
+header p{font-size:.95rem}
+#soundBtn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:#fff;border:3px solid var(--ink);border-radius:50%;width:46px;height:46px;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 0 var(--ink)}
+.scene{display:none;padding:20px 22px 26px;text-align:center;animation:sceneIn .55s cubic-bezier(.34,1.4,.5,1);min-height:440px}
+.scene.active{display:block}
+@keyframes sceneIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+h2.title{color:var(--accent);font-size:clamp(1.3rem,4.5vw,1.9rem);margin-bottom:6px}
+.bubble{background:#fff;border:3px solid var(--ink);border-radius:22px;padding:14px 20px;max-width:600px;margin:12px auto;font-size:clamp(1rem,3vw,1.2rem);line-height:1.55;position:relative;box-shadow:0 5px 0 rgba(43,35,80,.15);animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.bubble::before{content:'';position:absolute;bottom:-16px;left:70px;border:10px solid transparent;border-top-color:var(--ink)}
+.bubble::after{content:'';position:absolute;bottom:-10px;left:73px;border:8px solid transparent;border-top-color:#fff}
+.speaker{color:var(--accent);font-weight:bold}
+.big-btn{background:var(--teal);color:#fff;border:3px solid var(--ink);cursor:pointer;font-family:inherit;font-size:clamp(1rem,3vw,1.25rem);font-weight:bold;padding:14px 38px;border-radius:50px;box-shadow:0 6px 0 var(--ink);margin-top:8px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.04)}}
+.big-btn:active{transform:translateY(5px)!important;box-shadow:0 1px 0 var(--ink);animation:none}
+.big-btn:focus-visible,.shape-card:focus-visible,.quiz-opt:focus-visible{outline:4px solid var(--yellow);outline-offset:3px}
+.big-btn.pink{background:var(--pink)}.big-btn.purple{background:var(--purple)}
+
+/* stage */
+.stage{position:relative;height:280px;margin:8px auto 4px;max-width:640px;border-radius:22px;overflow:hidden;border:4px solid var(--ink);background:linear-gradient(180deg,#8ed6ff 0%,#cdeffd 55%,#b8e986 55%,#8fd05f 100%)}
+.stage.indoor{background:linear-gradient(180deg,#ffe6c7 0%,#ffe6c7 62%,#c98f5f 62%,#a9713d 100%)}
+.stage.study{background:linear-gradient(180deg,#e2d4f7 0%,#e2d4f7 62%,#8f6fc9 62%,#6b4ea3 100%)}
+.sun{position:absolute;top:10px;right:14px;font-size:2.4rem;animation:spin 14s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cloud{position:absolute;font-size:2.2rem;animation:drift 16s ease-in-out infinite alternate}
+.c1{top:16px;left:24px}.c2{top:44px;left:200px;animation-delay:-8s}
+@keyframes drift{to{transform:translateX(70px)}}
+.tree{position:absolute;bottom:40px;font-size:2.8rem}
+.mansion{position:absolute;bottom:40px;left:55%;font-size:5rem;transform:translateX(-50%)}
+.door{position:absolute;bottom:49px;left:55%;width:60px;height:85px;margin-left:-30px;transition:transform 1s;transform-origin:left center;z-index:2}
+.door.open{transform:perspective(300px) rotateY(75deg)}
+.decor{position:absolute;bottom:36px;font-size:2.8rem}
+.walldecor{position:absolute;top:26px;font-size:2.4rem}
+.item{position:absolute;font-size:2.6rem;line-height:1;cursor:pointer;animation:wiggle 1.3s ease-in-out infinite;transform-origin:50% 100%;z-index:3}
+@keyframes bob{50%{transform:translateY(-12px)}}
+.glow-frame{position:absolute;width:62px;height:62px;border:7px solid #8b5a2b;background:#ffe8d6;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;animation:glow 1.3s ease-in-out infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 10px 2px gold;transform:scale(1)}50%{box-shadow:0 0 30px 10px gold;transform:scale(1.1)}}
+
+/* characters */
+.kid-wrap,.mayor-wrap{position:absolute;bottom:24px;width:82px;height:150px}
+.kid-wrap{left:26px}.mayor-wrap{right:12%}
+svg.kid,svg.mayor{width:100%;height:100%;overflow:visible;transform-origin:50% 100%;animation:breathe 2.4s ease-in-out infinite}
+@keyframes breathe{50%{transform:scaleY(1.03)}}
+.arm,.leg{transform-box:fill-box;transform-origin:50% 5%}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 4s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.mouth{transform-box:fill-box;transform-origin:50% 0}
+.walk .l.leg,.walk .r.arm{--a:30deg;animation:swing .32s infinite alternate ease-in-out}
+.walk .r.leg,.walk .l.arm{--a:-30deg;animation:swing .32s infinite alternate ease-in-out}
+@keyframes swing{from{transform:rotate(var(--a))}to{transform:rotate(calc(var(--a)*-1))}}
+.walk svg{animation:hop .32s infinite alternate}
+@keyframes hop{to{transform:translateY(-6px)}}
+.kid-wrap.walk{animation:move 2s linear forwards}
+@keyframes move{to{left:calc(55% - 41px)}}
+.talk .r.arm,.wave .r.arm{animation:waveT .5s ease-in-out infinite alternate}
+@keyframes waveT{from{transform:rotate(-8deg)}to{transform:rotate(-45deg)}}
+.talk .mouth{animation:mouthT .25s ease-in-out infinite alternate}
+@keyframes mouthT{from{transform:scaleY(.4)}to{transform:scaleY(1.5)}}
+.happy{animation:jump .45s ease-in-out infinite alternate}
+@keyframes jump{to{transform:translateY(-26px)}}
+.happy .l.arm{animation:upL .3s infinite alternate}.happy .r.arm{animation:upR .3s infinite alternate}
+@keyframes upL{from{transform:rotate(150deg)}to{transform:rotate(178deg)}}
+@keyframes upR{from{transform:rotate(-150deg)}to{transform:rotate(-178deg)}}
+
+/* lesson */
+.lesson-stage{display:flex;flex-direction:column;align-items:center;gap:8px}
+.lsvg{width:clamp(150px,34vw,220px);height:auto}
+.lsvg .side{stroke:#e63946;stroke-width:14;stroke-linecap:round;fill:none;stroke-dasharray:300;stroke-dashoffset:300}
+.lsvg .side.draw{animation:drawSide .7s ease forwards}
+@keyframes drawSide{to{stroke-dashoffset:0}}
+.lsvg .corner{fill:#ffb703;stroke:#fff;stroke-width:4;opacity:0;transform-box:fill-box;transform-origin:center}
+.lsvg .corner.pop{animation:cornerPop .45s cubic-bezier(.34,1.8,.5,1) forwards}
+@keyframes cornerPop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+.lsvg .fillRect{fill:#ffd6e0;opacity:0;transition:opacity .7s}
+.lsvg .fillRect.show{opacity:1}
+.nm{font-size:clamp(2rem,8vw,3.4rem);font-weight:bold;color:var(--accent);letter-spacing:.15em;opacity:0;transform:scale(.3)}
+.nm.show{animation:nameIn .6s cubic-bezier(.34,1.8,.5,1) forwards}
+@keyframes nameIn{to{opacity:1;transform:scale(1)}}
+.side-chip{display:inline-block;color:#fff;font-weight:bold;padding:4px 14px;border-radius:14px;margin:3px;font-size:clamp(.85rem,2.6vw,1.05rem);animation:chipIn .4s ease backwards}
+@keyframes chipIn{from{opacity:0;transform:translateY(12px) scale(.6)}}
+.chip-row{min-height:44px}
+
+/* quiz */
+.quiz-opt{display:block;width:100%;max-width:440px;margin:10px auto;padding:12px;font-family:inherit;font-size:clamp(1rem,3vw,1.2rem);font-weight:bold;border-radius:18px;border:3px solid var(--ink);background:#eafaf6;color:var(--ink);cursor:pointer;box-shadow:0 4px 0 rgba(43,35,80,.25)}
+.quiz-opt:hover{background:#cdeee7}
+.quiz-opt.correct{background:#8fd05f;color:#fff}.quiz-opt.wrong{background:#ff8fab;color:#fff;animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+.shape-row{display:flex;justify-content:center;gap:14px;margin:12px 0;flex-wrap:wrap}
+.shape-card{width:clamp(70px,18vw,110px);height:clamp(70px,18vw,110px);border:4px solid var(--ink);border-radius:20px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.shape-card:hover{transform:translateY(-5px) rotate(-3deg)}
+.shape-card svg{width:75%;height:75%}
+.confetti{position:fixed;top:-20px;z-index:99;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.dots{text-align:center;padding:10px 0 14px}
+.dot{display:inline-block;width:13px;height:13px;border-radius:50%;background:#e2ddf0;margin:0 5px}
+.dot.on{background:var(--teal);transform:scale(1.25)}
+footer{text-align:center;padding:10px;background:#fff8e7;color:#7a6f99;font-size:.85rem}
+.prop{position:absolute;display:block}
+.step{position:absolute;bottom:20px;width:16px;height:9px;border-radius:50%;background:rgba(255,255,255,.85);animation:dust .7s forwards}
+@keyframes dust{to{opacity:0;transform:translateY(-10px) scale(2)}}
+@keyframes wiggle{0%,100%{transform:rotate(0)}15%{transform:rotate(-12deg)}30%{transform:rotate(10deg)}45%{transform:rotate(-7deg)}60%{transform:rotate(4deg)}75%{transform:rotate(0)}}
+.lens{position:absolute;font-size:2.2rem;pointer-events:none;z-index:3;animation:search 2s ease-in-out infinite}
+@keyframes search{0%,100%{transform:translate(0,0) rotate(-10deg)}50%{transform:translate(18px,-8px) rotate(15deg)}}
+.spark{position:fixed;z-index:99;pointer-events:none;font-size:1.3rem;transform:translate(-50%,-50%);animation:burst .8s ease-out forwards}
+@keyframes burst{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.4);opacity:0}}
+.bubble.card{background:#fff8dc;border-style:dashed}
+.bubble.unfold{transform-origin:top;animation:unfold .7s ease}
+@keyframes unfold{from{transform:perspective(500px) rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
+.mouth-o,.brow,.frown,.sweat{display:none}
+.surprised .mouth,.worried .mouth{display:none}
+.surprised .mouth-o,.surprised .brow,.worried .frown,.worried .brow,.worried .sweat{display:inline}
+.surprised .eye{animation:none;transform:scale(1.25)}
+svg.surprised{animation:startle .4s}
+@keyframes startle{30%{transform:translateY(-12px) scale(1.04)}}
+.worried .sweat{animation:drip 1.2s infinite}
+@keyframes drip{from{transform:translateY(0);opacity:1}to{transform:translateY(8px);opacity:0}}
+.worried .l.arm{animation:fid .5s ease-in-out infinite alternate}
+@keyframes fid{to{transform:rotate(16deg)}}
+.lsvg .side.done{stroke-dashoffset:0;animation:flash .6s}
+@keyframes flash{50%{stroke-width:22px;stroke:#ff9f1c}}
+.lsvg .tick{stroke:#1d4ed8;stroke-width:7;stroke-linecap:round;opacity:0;transition:opacity .4s}
+.lsvg .ra{stroke:#2b2350;stroke-width:5;fill:none;opacity:0;transition:opacity .4s}
+.lsvg #eq{fill:#1d4ed8;font-size:64px;font-weight:bold;opacity:0;transition:opacity .4s}
+.lsvg .tick.show,.lsvg .ra.show,.lsvg #eq.show{opacity:1}
+.jump{animation:hopOk .7s}
+@keyframes hopOk{35%{transform:translateY(-22px) scale(1.12)}65%{transform:translateY(0) scale(.96)}}
+.score{font-weight:bold;font-size:1.2rem;margin:6px 0}
+#num{display:inline-block}
+.sstar{display:inline-block;font-size:1.5rem;animation:starIn .7s cubic-bezier(.34,1.8,.5,1)}
+@keyframes starIn{from{transform:scale(0) rotate(-180deg)}}
+.silver{filter:grayscale(1)}
+.bump{animation:bumpN .5s}
+@keyframes bumpN{50%{transform:scale(1.8);color:#e8590c}}
+@media (prefers-reduced-motion:reduce){.lsvg .draw,.lsvg .done{stroke-dashoffset:0}.lsvg .pop{opacity:1}.nm.show{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ===== Levels 2 & 3 ===== */
+.stage.short{height:220px}
+.stage.mount{background:linear-gradient(180deg,#9ad8ff 0%,#e3f6ff 62%,#7cc46a 62%,#5aa84a 100%)}
+.mtn{position:absolute;inset:0;width:100%;height:100%}
+.grass{position:absolute;left:0;right:0;bottom:0;height:11%;background:#5aa84a;border-top:4px solid #3f8a35;z-index:1}
+.pet{position:absolute;font-size:2.6rem;line-height:1;animation:bob 1.2s ease-in-out infinite;z-index:3}
+.oi{width:64px;height:64px;display:block}
+.item.no{animation:shake .5s}
+.item.win{transform-origin:50% 50%;animation:spin 1.4s linear infinite;filter:drop-shadow(0 0 14px gold)}
+.kid-wrap.walk.enter{animation:enterK 1.8s ease-out both}
+@keyframes enterK{from{left:-100px}to{left:26px}}
+.cart{position:absolute;left:34%;bottom:50px;width:170px;height:118px;transform-origin:22% 100%;z-index:2}
+.cart .cb{position:absolute;left:0;top:0;width:170px;height:90px}
+.cart .wheel{position:absolute;bottom:0;width:44px;height:44px}
+.cart .wl{left:20px}.cart .wr{left:108px}
+.cart.broken{animation:cartShake 1.2s ease-in-out infinite}
+@keyframes cartShake{0%,100%{transform:rotate(5deg)}50%{transform:rotate(9deg)}}
+.wheel.away{animation:wAway 1.6s ease-in forwards}
+@keyframes wAway{to{transform:translateX(240px) rotate(900deg);opacity:0}}
+.cart.roll{left:26%;animation:cartGo 2.6s ease-in-out infinite alternate}
+@keyframes cartGo{to{transform:translateX(70px)}}
+.cart.roll .wheel{animation:spin .9s linear infinite}
+.lsvg .ring{fill:none;stroke:#2a9d8f;stroke-width:14;stroke-linecap:round;stroke-dasharray:640;stroke-dashoffset:640;transform:rotate(-90deg);transform-box:view-box;transform-origin:50% 50%}
+.lsvg .ring.draw{animation:drawSide 1.8s ease forwards}
+.spin-g{opacity:0;transition:opacity .5s;transform-box:view-box;transform-origin:50% 50%}
+.spin-g.show{opacity:1}.spin-g.rot{animation:spin 3.4s linear}
+.ptr{opacity:0;transform-box:view-box;transform-origin:50% 50%}.ptr.go{opacity:1;animation:spin 3s linear forwards}
+.lsvg.wob{animation:wob 1.6s ease-in-out}
+@keyframes wob{25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
+.pick{width:clamp(80px,21vw,120px);padding:8px 4px;border:4px solid var(--ink);border-radius:20px;background:#fff;cursor:pointer;font-family:inherit;color:var(--ink)}
+.pick:hover{transform:translateY(-4px)}
+.pick:focus-visible{outline:4px solid var(--yellow);outline-offset:3px}
+.pick .pv{display:block;height:clamp(48px,13vw,70px);font-size:clamp(2.2rem,8vw,3.2rem);line-height:1.3}
+.pick .pv svg{width:100%;height:100%}
+.pick .pl{display:block;font-weight:bold;margin-top:4px;color:var(--teal);visibility:hidden;font-size:clamp(.85rem,2.6vw,1.05rem)}
+.pick.found{background:#eafaf6;border-color:var(--teal)}.pick.found .pl{visibility:visible}
+.tbar{max-width:420px;height:18px;margin:8px auto;border:3px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff}
+#detBar{height:100%;width:100%;background:linear-gradient(90deg,#ff8fab,#ffb703)}
+.shape-card.glow-ok{background:#fff3b0;box-shadow:0 0 18px 6px gold}
+.cdot{position:absolute;transform:translate(-50%,-50%);z-index:4;cursor:pointer;border:3px solid #4a5568;background:#8d99ae;width:54px;height:44px;border-radius:50% 50% 45% 45%;font-family:inherit}
+.cdot.pt{width:38px;height:38px;border-radius:50%;background:#ffd23f;border:4px solid var(--ink)}
+.cdot[data-n]::after{content:attr(data-n);position:absolute;right:-8px;top:-10px;background:#e63946;color:#fff;border-radius:50%;width:22px;height:22px;font-size:.9rem;line-height:22px;font-weight:bold}
+.cdot.picked{background:#f4a261}.cdot.pt.picked{background:#ff8fab}
+.cdot.next{animation:glowD 1s ease-in-out infinite}
+@keyframes glowD{50%{filter:drop-shadow(0 0 14px gold);transform:translate(-50%,-50%) scale(1.22)}}
+.cdot.shake{animation:shakeC .4s}
+@keyframes shakeC{25%{transform:translate(calc(-50% - 9px),-50%)}75%{transform:translate(calc(-50% + 9px),-50%)}}
+.cdot.lit{filter:drop-shadow(0 0 14px gold);background:#ffd23f}
+.lines{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.lines path{stroke:#e63946;stroke-width:7;stroke-linecap:round;fill:none;vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1;animation:drawSide .5s ease forwards}
+.tri-fill{fill:rgba(255,183,3,.4);opacity:0;transition:opacity .6s}.tri-fill.show{opacity:1}
+.gate{position:absolute;left:52%;bottom:30px;width:110px;height:122px;transform:translateX(-50%);z-index:2;background:#1d1636;border:5px solid #5b4636;border-bottom:0;border-radius:56px 56px 0 0;overflow:hidden}
+.gate .dl,.gate .dr{position:absolute;top:0;width:50%;height:100%;background:repeating-linear-gradient(90deg,#8b5a2b 0 12px,#7a4a1f 12px 14px);transition:transform 1.2s}
+.gate .dl{left:0;transform-origin:left}.gate .dr{right:0;transform-origin:right}
+.gate.open{background:radial-gradient(circle,#fff6b0,#ffb703)}
+.gate.open .dl{transform:perspective(300px) rotateY(-85deg)}.gate.open .dr{transform:perspective(300px) rotateY(85deg)}
+.gate .lock{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;font-size:1.6rem}.gate.open .lock{display:none}
+.chest{position:absolute;left:52%;bottom:30px;width:92px;height:69px;transform:translateX(-50%);z-index:4;animation:shine 1.4s ease-in-out infinite}
+@keyframes shine{0%,100%{filter:drop-shadow(0 0 6px gold)}50%{filter:drop-shadow(0 0 22px gold)}}
+.fly{position:absolute;font-size:2.6rem;z-index:4;animation:flyIn 2.2s ease-out both,bob 1s ease-in-out 2.2s infinite}
+@keyframes flyIn{from{left:-70px;top:0}60%{top:60px}to{left:58%;top:70px}}
+.scrollfly{position:absolute;left:58%;top:70px;font-size:2rem;z-index:4;display:none;margin-left:10px}
+.scrollfly.drop{animation:dropIn 1.1s ease-in both}
+@keyframes dropIn{from{top:90px}to{top:190px}}
+.trio svg{width:70px;height:70px;margin:4px 8px}
+@media (prefers-reduced-motion:reduce){.lsvg .ring.draw{stroke-dashoffset:0}.ptr{opacity:1}}
+#tanSvg{width:100%;max-width:520px;background:linear-gradient(180deg,#fff8e7 0 49%,#e8f6ff 49%);border:4px solid var(--ink);border-radius:22px;touch-action:none;display:block;margin:8px auto;user-select:none}
+.tslot{fill:#ece8fa;stroke:#9a8fd0;stroke-width:.7;stroke-dasharray:2 1.5}
+.tslot.filled{fill:none;stroke:none}
+.tpiece{cursor:grab;touch-action:none}
+.tpiece polygon{stroke:#2b2350;stroke-width:.9;stroke-linejoin:round}
+.tpiece.lift{cursor:grabbing;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))}
+.tpiece.done{cursor:default}
+.tpiece.hint polygon,.tslot.hint{animation:tpulse .5s ease-in-out 3}
+.tslot.hint{stroke:#e63946;stroke-width:1.2}
+@keyframes tpulse{50%{opacity:.3}}
+#tanSvg.win .tpiece polygon{filter:drop-shadow(0 0 3px gold)}
+</style>
+</head>
+<body>
+<svg style="position:absolute;width:0;height:0" aria-hidden="true"><defs>
+<symbol id="p-sofa" viewBox="0 0 160 90"><rect x="14" y="6" width="132" height="58" rx="18" fill="#d6456f"/><rect x="2" y="34" width="26" height="50" rx="12" fill="#c23a62"/><rect x="132" y="34" width="26" height="50" rx="12" fill="#c23a62"/><rect x="22" y="44" width="116" height="34" rx="10" fill="#f0719a"/><path d="M80 46V76" stroke="#d6456f" stroke-width="3"/><rect x="14" y="80" width="10" height="9" rx="3" fill="#6b3f1d"/><rect x="136" y="80" width="10" height="9" rx="3" fill="#6b3f1d"/><rect x="104" y="18" width="30" height="28" rx="8" fill="#ffd23f" transform="rotate(8 119 32)"/></symbol>
+<symbol id="p-shelf" viewBox="0 0 110 190"><rect width="110" height="190" rx="6" fill="#a8672f"/><rect x="8" y="8" width="94" height="174" rx="3" fill="#7a4a1f"/><rect x="6" y="50" width="98" height="6" fill="#c98543"/><rect x="6" y="94" width="98" height="6" fill="#c98543"/><rect x="6" y="138" width="98" height="6" fill="#c98543"/><rect x="12" y="22" width="9" height="28" fill="#e63946"/><rect x="22" y="18" width="8" height="32" fill="#3d9bff"/><rect x="31" y="24" width="10" height="26" fill="#ffd23f"/><rect x="42" y="20" width="8" height="30" fill="#46c46b"/><rect x="51" y="26" width="9" height="24" fill="#a855f7"/><rect x="60" y="62" width="10" height="32" fill="#ff8c42"/><rect x="71" y="66" width="8" height="28" fill="#2a9d8f"/><rect x="80" y="60" width="9" height="34" fill="#e63946"/><rect x="90" y="68" width="8" height="26" fill="#3d9bff"/><rect x="14" y="108" width="9" height="30" fill="#ffd23f"/><rect x="24" y="104" width="10" height="34" fill="#a855f7"/><rect x="35" y="112" width="8" height="26" fill="#e63946"/><rect x="44" y="106" width="9" height="32" fill="#46c46b"/><circle cx="80" cy="156" r="12" fill="#ff8fab"/><rect x="14" y="152" width="30" height="30" rx="4" fill="#ffd23f"/></symbol>
+<symbol id="p-window" viewBox="0 0 90 100"><rect width="90" height="100" rx="8" fill="#fff"/><rect x="7" y="7" width="76" height="86" rx="4" fill="#8fd3ff"/><circle cx="62" cy="28" r="10" fill="#ffd23f"/><ellipse cx="30" cy="40" rx="14" ry="7" fill="#fff"/><path d="M7 93V70Q25 60 45 72Q65 60 83 70V93Z" fill="#7fd66e"/><rect x="43" y="7" width="4" height="86" fill="#fff"/><rect x="7" y="48" width="76" height="4" fill="#fff"/><path d="M0 0Q16 40 4 100H0Z" fill="#ff8fab"/><path d="M90 0Q74 40 86 100H90Z" fill="#ff8fab"/></symbol>
+<symbol id="p-clock" viewBox="0 0 50 50"><circle cx="25" cy="25" r="23" fill="#fff" stroke="#8b5a2b" stroke-width="5"/><path d="M25 8V12M25 38V42M8 25H12M38 25H42" stroke="#2b2350" stroke-width="2.5"/><path d="M25 25V14M25 25L34 30" stroke="#2b2350" stroke-width="3" stroke-linecap="round"/><circle cx="25" cy="25" r="2.5" fill="#e63946"/></symbol>
+<symbol id="p-desk" viewBox="0 0 140 100"><rect x="4" y="28" width="132" height="12" rx="4" fill="#c98543"/><rect x="12" y="40" width="10" height="58" fill="#8b5a2b"/><rect x="118" y="40" width="10" height="58" fill="#8b5a2b"/><rect x="28" y="40" width="84" height="34" rx="4" fill="#a8672f"/><rect x="62" y="52" width="16" height="6" rx="3" fill="#ffd23f"/><rect x="104" y="14" width="30" height="7" fill="#46c46b"/><rect x="106" y="21" width="28" height="7" fill="#e63946"/><rect x="60" y="8" width="4" height="20" fill="#555"/><path d="M50 8H74L68 0H56Z" fill="#ffd23f"/></symbol>
+<symbol id="p-house" viewBox="0 0 300 230"><rect x="20" y="95" width="260" height="130" fill="#ffd6a5"/><polygon points="5,100 150,10 295,100" fill="#e4572e"/><rect x="215" y="25" width="28" height="50" fill="#b9472a"/><rect x="45" y="125" width="52" height="50" rx="4" fill="#8fd3ff" stroke="#fff" stroke-width="5"/><rect x="203" y="125" width="52" height="50" rx="4" fill="#8fd3ff" stroke="#fff" stroke-width="5"/><path d="M71 125V175M45 150H97M229 125V175M203 150H255" stroke="#fff" stroke-width="4"/><rect x="120" y="140" width="60" height="85" rx="4" fill="#4a2f1a"/><circle cx="150" cy="70" r="14" fill="#fff" stroke="#8b5a2b" stroke-width="4"/><rect x="0" y="222" width="300" height="8" fill="#6bbf59"/></symbol>
+<symbol id="p-tree" viewBox="0 0 80 120"><rect x="34" y="70" width="12" height="50" fill="#8b5a2b"/><circle cx="40" cy="45" r="34" fill="#4caf50"/><circle cx="22" cy="58" r="22" fill="#66bb6a"/><circle cx="58" cy="58" r="22" fill="#66bb6a"/><circle cx="32" cy="35" r="5" fill="#ef5350"/><circle cx="52" cy="50" r="5" fill="#ef5350"/></symbol>
+<symbol id="p-wheel" viewBox="0 0 50 50"><circle cx="25" cy="25" r="23" fill="#ffd23f" stroke="#e09f00" stroke-width="4"/><circle cx="25" cy="25" r="15" fill="none" stroke="#e09f00" stroke-width="2.5"/><path d="M25 10V40M10 25H40M14.4 14.4L35.6 35.6M35.6 14.4L14.4 35.6" stroke="#e09f00" stroke-width="2.5"/><circle cx="25" cy="25" r="5" fill="#e63946"/></symbol>
+<symbol id="p-coin" viewBox="0 0 50 50"><circle cx="25" cy="25" r="23" fill="#f4c430" stroke="#b8860b" stroke-width="3"/><circle cx="25" cy="25" r="17" fill="none" stroke="#b8860b" stroke-width="2"/><text x="25" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#b8860b">1</text></symbol>
+<symbol id="p-plate" viewBox="0 0 50 50"><circle cx="25" cy="25" r="23" fill="#fff" stroke="#3d9bff" stroke-width="4"/><circle cx="25" cy="25" r="14" fill="#eaf4ff" stroke="#3d9bff" stroke-width="2"/><circle cx="25" cy="25" r="4" fill="#ff8fab"/></symbol>
+<symbol id="p-box" viewBox="0 0 50 50"><rect x="8" y="14" width="34" height="34" rx="3" fill="#e63946"/><rect x="22" y="14" width="6" height="34" fill="#ffd23f"/><rect x="8" y="27" width="34" height="6" fill="#ffd23f"/><path d="M25 14Q14 4 17 9Q19 13 25 14Q31 13 33 9Q36 4 25 14Z" fill="#ffd23f" stroke="#e09f00"/></symbol>
+<symbol id="p-sign" viewBox="0 0 50 60"><rect x="22" y="30" width="6" height="30" fill="#8b5a2b"/><polygon points="25,4 47,42 3,42" fill="#ffd23f" stroke="#e09f00" stroke-width="3"/><text x="25" y="36" text-anchor="middle" font-size="18" font-weight="bold" fill="#2b2350">!</text></symbol>
+<symbol id="p-frame" viewBox="0 0 50 50"><rect x="5" y="5" width="40" height="40" fill="#ffe8d6" stroke="#8b5a2b" stroke-width="5"/><path d="M25 35L16 25Q14 18 21 19L25 23L29 19Q36 18 34 25Z" fill="#ff5fa2"/></symbol>
+<symbol id="p-book" viewBox="0 0 50 50"><rect x="6" y="14" width="38" height="24" rx="3" fill="#3d9bff"/><rect x="6" y="14" width="6" height="24" fill="#1d4ed8"/><rect x="18" y="22" width="18" height="4" fill="#fff"/></symbol>
+<symbol id="p-chest" viewBox="0 0 80 60"><rect x="6" y="28" width="68" height="28" rx="4" fill="#a8672f" stroke="#6b3f1d" stroke-width="3"/><path d="M6 30Q6 6 40 6Q74 6 74 30Z" fill="#c98543" stroke="#6b3f1d" stroke-width="3"/><rect x="34" y="26" width="12" height="14" rx="2" fill="#ffd23f" stroke="#b8860b" stroke-width="2"/><circle cx="24" cy="14" r="4" fill="#ffd23f"/><circle cx="40" cy="10" r="4" fill="#ffd23f"/><circle cx="56" cy="14" r="4" fill="#ffd23f"/></symbol>
+</defs></svg>
+<div class="book">
+  <header>
+    <h1>🔺 Shapes Around Us 🔷</h1>
+    <p>Mia’s Shape Adventure — Level 1: The Square</p>
+    <button id="soundBtn" title="Sound on/off" aria-label="Sound on or off">🔊</button>
+  </header>
+
+  <section class="scene active" id="s1">
+<h2 class="title">Welcome to Shapeville! 🏡</h2>
+<div class="stage "><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><svg class="prop" style="width:300px;height:230px;bottom:44px;left:55%;transform:translateX(-50%)"><use href="#p-house"/></svg><div class="door"><svg viewBox="0 0 60 85" width="60" height="85"><rect width="60" height="85" rx="4" fill="#e76f51"/><rect x="8" y="8" width="18" height="30" rx="3" fill="#f4a261"/><rect x="34" y="8" width="18" height="30" rx="3" fill="#f4a261"/><circle cx="50" cy="48" r="4" fill="#ffd23f"/></svg></div><div class="kid-wrap"><svg class="kid talk" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mia:</span> Hello, friend! I’m <b>Mia</b>, a shape detective! The Mayor lost his favourite photo frame. Will you help me find it?</div>
+<button class="big-btn" onclick="go(2)">Yes, let’s go! ➜</button>
+</section>
+
+  <section class="scene" id="s2">
+<h2 class="title">Walk to the Mansion 👣</h2>
+<div class="stage "><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><svg class="prop" style="width:300px;height:230px;bottom:44px;left:55%;transform:translateX(-50%)"><use href="#p-house"/></svg><div class="door" id="door"><svg viewBox="0 0 60 85" width="60" height="85"><rect width="60" height="85" rx="4" fill="#e76f51"/><rect x="8" y="8" width="18" height="30" rx="3" fill="#f4a261"/><rect x="34" y="8" width="18" height="30" rx="3" fill="#f4a261"/><circle cx="50" cy="48" r="4" fill="#ffd23f"/></svg></div><div class="kid-wrap" id="walker"><svg class="kid " viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mia:</span> Tap the button and watch me walk to the big door!</div>
+<button class="big-btn" id="walkBtn" onclick="miaWalk()">Walk, Mia! 👣</button>
+</section>
+
+  <section class="scene" id="s3">
+<h2 class="title">The Mayor’s Problem 🎩</h2>
+<div class="stage indoor"><svg class="prop" style="width:100px;height:111px;top:22px;left:6%"><use href="#p-window"/></svg><svg class="prop" style="width:54px;height:54px;top:30px;left:44%"><use href="#p-clock"/></svg><svg class="prop" style="width:170px;height:96px;bottom:68px;left:27%"><use href="#p-sofa"/></svg><div class="mayor-wrap"><svg class="mayor worried" viewBox="0 0 60 110"></svg></div><div class="kid-wrap"><svg class="kid wave" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mia:</span> Hello, Mr. Mayor!<br><span class="speaker">Mayor:</span> “Oh dear! My family photo frame has <b>disappeared</b>!”<br><span class="speaker">Mia:</span> Don’t worry! Let’s find it together! 🔍</div>
+<button class="big-btn" onclick="go(4)">Start investigating! 🔍</button>
+</section>
+
+  <section class="scene" id="s4">
+<h2 class="title">Clue Number One 📝</h2>
+<div class="stage indoor"><svg class="prop" style="width:100px;height:111px;top:22px;left:6%"><use href="#p-window"/></svg><svg class="prop" style="width:54px;height:54px;top:30px;left:44%"><use href="#p-clock"/></svg><svg class="prop" style="width:170px;height:96px;bottom:68px;left:34%"><use href="#p-sofa"/></svg><svg class="prop" style="width:100px;height:173px;bottom:68px;right:5%"><use href="#p-shelf"/></svg><div class="item" id="note1" style="left:44%;bottom:108px" onclick="clue1()" role="button" aria-label="Clue scroll">📜</div><div class="lens" id="lens4" style="left:49%;bottom:150px">🔍</div><div class="kid-wrap"><svg class="kid " id="kid4" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble" id="bubble4"><span class="speaker">Mia:</span> I see something on the sofa! <b>Tap the shaking scroll!</b></div>
+<button class="big-btn" onclick="go(5)" id="next4" style="display:none">Next clue ➜</button>
+</section>
+
+  <section class="scene" id="s5">
+<h2 class="title">Clue Number Two 📚</h2>
+<div class="stage study"><svg class="prop" style="width:100px;height:111px;top:22px;left:5%"><use href="#p-window"/></svg><svg class="prop" style="width:100px;height:173px;bottom:68px;left:36%"><use href="#p-shelf"/></svg><svg class="prop" style="width:150px;height:107px;bottom:68px;right:8%"><use href="#p-desk"/></svg><div class="item" id="note2" style="left:72%;bottom:150px" onclick="clue2()" role="button" aria-label="Clue note">📝</div><div class="lens" id="lens5" style="left:77%;bottom:192px">🔍</div><div class="kid-wrap"><svg class="kid " id="kid5" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble" id="bubble5"><span class="speaker">Mia:</span> The study room! There’s a note on the desk. <b>Tap it!</b></div>
+<button class="big-btn pink" onclick="go(6)" id="next5" style="display:none">Find the frame! ✨</button>
+</section>
+
+  <section class="scene" id="s6">
+<h2 class="title">Something Is Glowing! ✨</h2>
+<div class="stage study"><svg class="prop" style="width:100px;height:111px;top:22px;left:5%"><use href="#p-window"/></svg><svg class="prop" style="width:100px;height:173px;bottom:68px;left:36%"><use href="#p-shelf"/></svg><svg class="prop" style="width:150px;height:107px;bottom:68px;right:8%"><use href="#p-desk"/></svg><div class="glow-frame" style="left:75%;bottom:150px" onclick="foundFrame(this)" role="button" aria-label="Golden photo frame">👨‍👩‍👧</div><div class="kid-wrap"><svg class="kid surprised" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mia:</span> Wow, look at that golden light on the desk! <b>Tap the glowing frame!</b></div>
+
+</section>
+
+  <section class="scene" id="s7">
+<h2 class="title">What Shape Is It? 🎓</h2>
+<div class="lesson-stage">
+<svg id="sqSvg" class="lsvg" viewBox="0 0 300 300">
+<rect class="fillRect" id="fillRect" x="50" y="50" width="200" height="200" rx="8"/>
+<line class="side" x1="50" y1="50" x2="250" y2="50"/><line class="side" x1="250" y1="50" x2="250" y2="250"/><line class="side" x1="250" y1="250" x2="50" y2="250"/><line class="side" x1="50" y1="250" x2="50" y2="50"/>
+<path class="ra" d="M72 50V72H50"/><path class="ra" d="M228 50V72H250"/><path class="ra" d="M228 250V228H250"/><path class="ra" d="M72 250V228H50"/>
+<line class="tick" x1="150" y1="36" x2="150" y2="64"/><line class="tick" x1="236" y1="150" x2="264" y2="150"/><line class="tick" x1="150" y1="236" x2="150" y2="264"/><line class="tick" x1="36" y1="150" x2="64" y2="150"/>
+<text id="eq" x="150" y="172" text-anchor="middle">=</text>
+<circle class="corner" cx="50" cy="50" r="13"/><circle class="corner" cx="250" cy="50" r="13"/><circle class="corner" cx="250" cy="250" r="13"/><circle class="corner" cx="50" cy="250" r="13"/>
+</svg>
+<div class="chip-row" id="chips"></div>
+<div id="sqName" class="nm">SQUARE</div>
+</div>
+<div class="bubble" id="bubble7"><span class="speaker">Mia:</span> Watch carefully… I will draw the shape for you!</div>
+<button class="big-btn purple" onclick="startLesson()" id="lessonBtn">Teach me, Mia! ✨</button>
+<button class="big-btn" onclick="go(8)" id="next7" style="display:none">I’m ready for the quiz! ➜</button>
+</section>
+
+  <section class="scene" id="s8">
+    <h2 class="title">Shape Detective Quiz 🕵️</h2>
+<div class="score">Score: <span id="stars"></span> <b id="num">0</b>/3</div>
+    <div class="bubble" id="quizBox"></div>
+    <div id="quizNext" style="display:none"><button class="big-btn" onclick="nextQuestion()">Next ➜</button></div>
+  </section>
+
+  <section class="scene" id="s9">
+<h2 class="title">Mission Complete! 🎉</h2>
+<div class="stage indoor"><svg class="prop" style="width:100px;height:111px;top:22px;left:6%"><use href="#p-window"/></svg><svg class="prop" style="width:54px;height:54px;top:30px;left:44%"><use href="#p-clock"/></svg><svg class="prop" style="width:170px;height:96px;bottom:68px;left:27%"><use href="#p-sofa"/></svg><div class="mayor-wrap"><svg class="mayor happy" viewBox="0 0 60 110"></svg></div><div class="kid-wrap" style="left:34%"><svg class="kid happy" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mayor:</span> “My photograph! Thank you!”<br><span class="speaker">Mia:</span> Hooray! You learned the <b>SQUARE</b>: 4 equal sides, 4 corners and 4 right angles! You are a <b>Shape Detective</b>! 🏅<br><b id="fs"></b></div>
+<button class="big-btn" onclick="go(10)">Level 2: The Magic Wheel ➜</button>
+</section>
+
+  <!-- ========== LEVEL 2 ========== -->
+<section class="scene" id="s10">
+<h2 class="title">The Mystery of the Missing Magic Wheel 🌷</h2>
+<div class="stage"><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><div class="decor" style="left:12%">🌷</div><div class="decor" style="left:80%">🌻</div><div class="cart " id="cart10"><svg class="cb" viewBox="0 0 170 90"><path d="M148 36L166 8" stroke="#8b5a2b" stroke-width="6" stroke-linecap="round"/><rect x="8" y="34" width="140" height="48" rx="10" fill="#ff8fab" stroke="#2b2350" stroke-width="3"/><rect x="8" y="48" width="140" height="6" fill="#ffc2d1"/><circle cx="32" cy="28" r="12" fill="#ffd23f"/><circle cx="62" cy="22" r="13" fill="#ff5fa2"/><circle cx="94" cy="26" r="12" fill="#7b5cd6"/><circle cx="122" cy="24" r="11" fill="#ffd23f"/><circle cx="32" cy="28" r="4" fill="#e63946"/><circle cx="62" cy="22" r="4" fill="#fff"/><circle cx="94" cy="26" r="4" fill="#fff"/><circle cx="122" cy="24" r="4" fill="#e63946"/></svg><svg class="wheel wl"><use href="#p-wheel"/></svg><svg class="wheel wr" id="wr10"><use href="#p-wheel"/></svg></div><div class="kid-wrap" style=""><svg class="kid walk enter talk" id="k10" viewBox="0 0 60 110"></svg></div><div class="mayor-wrap"><svg class="mayor worried" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mayor:</span> “Mia! Mia! I need your help again!”<br><span class="speaker">Mia:</span> What happened, Mayor?<br><span class="speaker">Mayor:</span> “My magical flower cart has lost a wheel! Without it I cannot deliver flowers to the children!”<br><span class="speaker">Mia:</span> Don’t worry! Your Shape Detective is here! 🔍</div>
+<button class="big-btn" onclick="go(11)">Let’s find the wheel! ➜</button>
+</section>
+
+<section class="scene" id="s11">
+<h2 class="title">The Garden Investigation 🔍</h2>
+<div class="stage"><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg>
+<div class="item" style="left:26%;bottom:76px" onclick="probe('box',this)" role="button" aria-label="Square gift box"><svg class="oi"><use href="#p-box"/></svg></div>
+<div class="item" style="left:46%;bottom:76px" onclick="probe('sign',this)" role="button" aria-label="Triangle garden sign"><svg class="oi"><use href="#p-sign"/></svg></div>
+<div class="item" style="left:64%;bottom:76px" onclick="probe('gold',this)" role="button" aria-label="Round golden object"><svg class="oi"><use href="#p-wheel"/></svg></div>
+<div class="pet" style="right:3%;bottom:60px">🐰</div><div class="kid-wrap" style=""><svg class="kid talk" id="k11" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble" id="bubble11"><span class="speaker">Mia:</span> Look! I found three interesting objects. Which one could be the missing wheel?<br><span class="speaker">Bobo:</span> “I think it’s the round one!”<br><span class="speaker">Mia:</span> Let’s tap it and find out! 👆</div>
+<button class="big-btn" id="next11" style="display:none" onclick="go(12)">What shape is it? ➜</button>
+</section>
+
+<section class="scene" id="s12">
+<h2 class="title">Discovering the Circle 🎓</h2>
+<div class="lesson-stage">
+<svg id="ciSvg" class="lsvg" viewBox="0 0 300 300">
+<circle id="ciFill" class="fillRect" style="fill:#fff0a8" cx="150" cy="150" r="100"/>
+<circle id="ciRing" class="ring" cx="150" cy="150" r="100"/>
+<g id="ciSpin" class="spin-g"><path d="M150 50V250M50 150H250M79 79L221 221M221 79L79 221" stroke="#e09f00" stroke-width="6" stroke-linecap="round"/><text x="150" y="104" text-anchor="middle" font-size="34" fill="#e63946">★</text><circle cx="150" cy="150" r="12" fill="#e63946"/></g>
+<g id="ciPtr" class="ptr"><circle cx="150" cy="50" r="12" fill="#e63946" stroke="#fff" stroke-width="4"/></g>
+<circle id="ciDot" class="corner" style="fill:#e63946" cx="150" cy="50" r="12"/>
+</svg>
+<div class="chip-row" id="ciChips"></div><div id="ciName" class="nm">CIRCLE</div>
+</div>
+<div class="bubble" id="bubble12"><span class="speaker">Mia:</span> Wonderful! We found the missing wheel! But do you know what shape it is?<br><span class="speaker">Bobo:</span> “Is it a square?”<br><span class="speaker">Mia:</span> No, Bobo! Watch carefully…</div>
+<button class="big-btn purple" id="btn12" onclick="lesson(ciSteps,'bubble12','btn12')">Show me, Mia! ✨</button>
+<button class="big-btn" id="next12" style="display:none" onclick="go(13)">Find more circles ➜</button>
+</section>
+
+<section class="scene" id="s13">
+<h2 class="title">Find Circles Around You 🔎</h2>
+<div class="stage short"><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><div class="decor" style="left:34%">🌼</div><div class="decor" style="left:60%">🌷</div><div class="kid-wrap" style=""><svg class="kid talk" id="k13" viewBox="0 0 60 110"></svg></div><div class="pet" style="right:6%;bottom:44px">🐰</div></div>
+<div class="bubble" id="bubble13"><span class="speaker">Mia:</span> Can you find other circles in the garden? Tap the round things below!</div>
+<div class="shape-row" id="row13"></div>
+<button class="big-btn pink" id="next13" style="display:none" onclick="go(14)">Play Circle Detective! ➜</button>
+</section>
+
+<section class="scene" id="s14">
+<h2 class="title">Circle Detective 🕵️</h2>
+<div class="stage short"><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><div class="kid-wrap" style=""><svg class="kid talk" id="k14" viewBox="0 0 60 110"></svg></div><div class="pet" style="right:6%;bottom:44px">🐰</div></div>
+<div class="bubble" id="bubble14"><span class="speaker">Mia:</span> Tap all the circular objects before the magic timer runs out!</div>
+<div class="tbar" style="display:none"><div id="detBar"></div></div>
+<div class="shape-row" id="detRow"></div>
+<button class="big-btn purple" id="detGo" onclick="startDet()">I’m ready! ⏱️</button>
+<button class="big-btn" id="next14" style="display:none" onclick="go(15)">Finish ➜</button>
+</section>
+
+<section class="scene" id="s15">
+<h2 class="title">Level 2 Complete! 🎉</h2>
+<div class="stage"><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><div class="cart roll" id="cart15"><svg class="cb" viewBox="0 0 170 90"><path d="M148 36L166 8" stroke="#8b5a2b" stroke-width="6" stroke-linecap="round"/><rect x="8" y="34" width="140" height="48" rx="10" fill="#ff8fab" stroke="#2b2350" stroke-width="3"/><rect x="8" y="48" width="140" height="6" fill="#ffc2d1"/><circle cx="32" cy="28" r="12" fill="#ffd23f"/><circle cx="62" cy="22" r="13" fill="#ff5fa2"/><circle cx="94" cy="26" r="12" fill="#7b5cd6"/><circle cx="122" cy="24" r="11" fill="#ffd23f"/><circle cx="32" cy="28" r="4" fill="#e63946"/><circle cx="62" cy="22" r="4" fill="#fff"/><circle cx="94" cy="26" r="4" fill="#fff"/><circle cx="122" cy="24" r="4" fill="#e63946"/></svg><svg class="wheel wl"><use href="#p-wheel"/></svg><svg class="wheel wr" id="wr15"><use href="#p-wheel"/></svg></div><div class="kid-wrap" style="left:6%"><svg class="kid happy" viewBox="0 0 60 110"></svg></div><div class="mayor-wrap"><svg class="mayor happy" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Mayor:</span> “Hooray! My flower cart is moving again!”<br><span class="speaker">Mia:</span> You discovered the <b>CIRCLE</b>! It is round, with a curved boundary and no corners. You are becoming a wonderful Shape Detective! 🏅</div>
+<button class="big-btn" onclick="go(16)">Level 3: Triangle Mountain ➜</button>
+</section>
+
+<!-- ========== LEVEL 3 ========== -->
+<section class="scene" id="s16">
+<h2 class="title">The Mysterious Message 📜</h2>
+<div class="stage"><div class="sun">🌞</div><div class="cloud c1">☁️</div><div class="cloud c2">☁️</div><svg class="prop" style="width:70px;height:105px;bottom:58px;left:2%"><use href="#p-tree"/></svg><svg class="prop" style="width:70px;height:105px;bottom:58px;right:3%"><use href="#p-tree"/></svg><div class="decor" style="left:48%;font-size:3.4rem">⛲</div><div class="kid-wrap" style=""><svg class="kid wave" id="k16" viewBox="0 0 60 110"></svg></div><div class="fly" id="tiki">🐦</div><div class="scrollfly" id="sc16">📜</div></div>
+<div class="bubble"><span class="speaker">Tiki:</span> “Tweet! Tweet! Mia, I have a secret message for you!”<br><span class="speaker">Mia:</span> A secret message? What does it say?<br><span class="speaker">Tiki:</span> “The treasure is hidden behind Triangle Mountain. Find the shape with three sides to unlock the gate!”<br><span class="speaker">Mia:</span> Interesting! Let’s go on another adventure!</div>
+<div class="bubble card unfold" id="scrollCard" style="display:none"><b>📜 The Secret Message</b><br>Find the shape with <b>three sides</b>!<br><svg width="70" height="70" viewBox="0 0 100 100"><polygon points="50,10 92,88 8,88" fill="#ffb300" stroke="#2b2350" stroke-width="5" stroke-linejoin="round"/></svg></div>
+<button class="big-btn" id="next16" style="display:none" onclick="go(17)">To Triangle Mountain! ⛰️</button>
+</section>
+
+<section class="scene" id="s17">
+<h2 class="title">Reaching Triangle Mountain ⛰️</h2>
+<div class="stage mount" id="st17"><svg class="mtn" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="10,100 52,6 95,100" fill="#8d99ae"/><polygon points="52,6 95,100 72,100" fill="#7a8599" opacity=".6"/><polygon points="52,6 60,26 52,21 44,28" fill="#fff"/></svg><div class="grass"></div><div class="gate " id="gate17"><div class="dl"></div><div class="dr"></div><div class="lock">🔒</div></div>
+<button class="cdot" data-x="30" data-y="60" data-n="1" style="left:30%;top:60%" aria-label="Stone 1"></button>
+<button class="cdot" data-x="52" data-y="17" data-n="2" style="left:52%;top:17%" aria-label="Stone 2"></button>
+<button class="cdot" data-x="74" data-y="58" data-n="3" style="left:74%;top:58%" aria-label="Stone 3"></button>
+<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon class="tri-fill" points="30,60 52,17 74,58"/></svg>
+<div class="pet" style="right:3%;top:6%">🐦</div><div class="kid-wrap" style=""><svg class="kid talk" id="k17" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble" id="bubble17"><span class="speaker">Mia:</span> Oh! The gate is locked. How can we open it?<br><span class="speaker">Tiki:</span> “Look carefully, Mia! There are three stones near the gate.”<br><span class="speaker">Mia:</span> Maybe we need to connect them! 👆 Tap the glowing stones in order: 1, 2, 3.</div>
+<button class="big-btn" id="next17" style="display:none" onclick="go(18)">What shape is it? ➜</button>
+</section>
+
+<section class="scene" id="s18">
+<h2 class="title">Discovering the Triangle 🎓</h2>
+<div class="lesson-stage">
+<svg id="trSvg" class="lsvg" viewBox="0 0 300 300">
+<polygon id="trFill" class="fillRect" style="fill:#ffe0b2" points="150,40 260,250 40,250"/>
+<line class="side" x1="150" y1="40" x2="260" y2="250"/><line class="side" x1="260" y1="250" x2="40" y2="250"/><line class="side" x1="40" y1="250" x2="150" y2="40"/>
+<circle class="corner" cx="150" cy="40" r="13"/><circle class="corner" cx="260" cy="250" r="13"/><circle class="corner" cx="40" cy="250" r="13"/>
+</svg>
+<div class="chip-row" id="trChips"></div><div id="trName" class="nm">TRIANGLE</div>
+</div>
+<div class="bubble" id="bubble18"><span class="speaker">Mia:</span> Look! We made a triangle!<br><span class="speaker">Tiki:</span> “What makes it a triangle?”</div>
+<button class="big-btn purple" id="btn18" onclick="lesson(trSteps,'bubble18','btn18')">Show us, Mia! ✨</button>
+<button class="big-btn" id="next18" style="display:none" onclick="go(19)">Explore the mountain ➜</button>
+</section>
+
+<section class="scene" id="s19">
+<h2 class="title">Explore the Mountain 🔎</h2>
+<div class="stage mount short"><svg class="mtn" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="10,100 52,6 95,100" fill="#8d99ae"/><polygon points="52,6 95,100 72,100" fill="#7a8599" opacity=".6"/><polygon points="52,6 60,26 52,21 44,28" fill="#fff"/></svg><div class="grass"></div><div class="kid-wrap" style=""><svg class="kid talk" id="k19" viewBox="0 0 60 110"></svg></div><div class="pet" style="right:4%;top:8%">🐦</div></div>
+<div class="bubble" id="bubble19"><span class="speaker">Mia:</span> Triangles are hiding everywhere! Can you find them? Tap the triangle things below!</div>
+<div class="shape-row" id="row19"></div>
+<button class="big-btn pink" id="next19" style="display:none" onclick="go(20)">Open the gate! ➜</button>
+</section>
+
+<section class="scene" id="s20">
+<h2 class="title">Build the Triangle 🔺</h2>
+<div class="stage mount" id="st20"><svg class="mtn" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="10,100 52,6 95,100" fill="#8d99ae"/><polygon points="52,6 95,100 72,100" fill="#7a8599" opacity=".6"/><polygon points="52,6 60,26 52,21 44,28" fill="#fff"/></svg><div class="grass"></div><div class="gate " id="gate20"><div class="dl"></div><div class="dr"></div><div class="lock">🔒</div></div>
+<button class="cdot pt" data-x="28" data-y="62" style="left:28%;top:62%" aria-label="Dot"></button>
+<button class="cdot pt" data-x="76" data-y="56" style="left:76%;top:56%" aria-label="Dot"></button>
+<button class="cdot pt" data-x="52" data-y="16" style="left:52%;top:16%" aria-label="Dot"></button>
+<svg class="lines" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon class="tri-fill" points="28,62 76,56 52,16"/></svg>
+<div class="pet" style="right:3%;top:6%">🐦</div><div class="kid-wrap" style=""><svg class="kid talk" id="k20" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble" id="bubble20"><span class="speaker">Mia:</span> The mountain gate needs a triangle to open. Can you connect the three points? Tap a dot, then the next, then the third!</div>
+</section>
+
+<section class="scene" id="s21">
+<h2 class="title">The Treasure Lock 🧩</h2>
+<div class="bubble" id="bubble21"><span class="speaker">Tiki:</span> “The treasure chest has a magic Tangram lock! Build the big square with the 7 magic blocks.”<br><span class="speaker">Mia:</span> Drag each block to its dotted shape! 👆</div>
+<div class="score">Blocks placed: <b id="tanCount">0</b>/7</div>
+<svg id="tanSvg" viewBox="0 0 130 118" aria-label="Tangram puzzle"></svg>
+<button class="big-btn purple" onclick="tanHint()">Hint 💡</button>
+<button class="big-btn" id="tanNext" style="display:none" onclick="go(22)">Open the treasure! ➜</button>
+</section>
+
+<section class="scene" id="s22">
+<h2 class="title">The Hidden Treasure 💎</h2>
+<div class="stage mount"><svg class="mtn" viewBox="0 0 100 100" preserveAspectRatio="none"><polygon points="10,100 52,6 95,100" fill="#8d99ae"/><polygon points="52,6 95,100 72,100" fill="#7a8599" opacity=".6"/><polygon points="52,6 60,26 52,21 44,28" fill="#fff"/></svg><div class="grass"></div><div class="gate open" id="gate21"><div class="dl"></div><div class="dr"></div><div class="lock">🔒</div></div><svg class="chest"><use href="#p-chest"/></svg><div class="pet" style="right:20%;top:8%">🐦</div><div class="pet" style="left:44%;top:14%;font-size:1.6rem">✨</div><div class="kid-wrap" style="left:4%"><svg class="kid happy" viewBox="0 0 60 110"></svg></div><div class="mayor-wrap"><svg class="mayor happy" viewBox="0 0 60 110"></svg></div></div>
+<div class="bubble"><span class="speaker">Tiki:</span> “You did it, Mia! The treasure is open!”<br><span class="speaker">Mia:</span> We solved the mystery of Triangle Mountain!<br><span class="speaker">Mayor:</span> “Wonderful work, Shape Detective! You have learned about <b>squares</b>, <b>circles</b> and <b>triangles</b>!” 🏅</div>
+<div class="trio"><svg viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" rx="6" fill="#ff5fa2"/></svg><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#46c46b"/></svg><svg viewBox="0 0 100 100"><polygon points="50,10 92,88 8,88" fill="#ffb300"/></svg></div>
+<button class="big-btn pink" onclick="location.reload()">Play again 🔁</button>
+</section>
+
+<div class="dots" id="dots" aria-hidden="true"></div>
+  <footer>Shapes Around Us • Mia’s Shape Adventure • Levels 1–3 • A story-based learning prototype for Class 3</footer>
+</div>
+
+<script>
+/* ---------- CHARACTERS (full-body SVG) ---------- */
+const eyes=(y)=>`<g class="eye"><circle cx="22" cy="${y}" r="5.5" fill="#fff"/><circle cx="23" cy="${y+1}" r="3" fill="#222"/></g><g class="eye"><circle cx="38" cy="${y}" r="5.5" fill="#fff"/><circle cx="39" cy="${y+1}" r="3" fill="#222"/></g>`;
+const KID=`<g class="leg l"><rect x="19" y="72" width="10" height="28" rx="5" fill="#3d6dff"/><ellipse cx="23" cy="103" rx="9" ry="5" fill="#ffb300"/></g>
+<g class="leg r"><rect x="31" y="72" width="10" height="28" rx="5" fill="#3d6dff"/><ellipse cx="37" cy="103" rx="9" ry="5" fill="#ffb300"/></g>
+<g class="arm l"><rect x="7" y="46" width="9" height="26" rx="4.5" fill="#ff5fa2"/><circle cx="11.5" cy="74" r="5" fill="#ffcf9f"/></g>
+<g class="arm r"><rect x="44" y="46" width="9" height="26" rx="4.5" fill="#ff5fa2"/><circle cx="48.5" cy="74" r="5" fill="#ffcf9f"/></g>
+<rect x="14" y="44" width="32" height="36" rx="12" fill="#ff5fa2"/>
+<path d="M30 55l2.5 5 5.5.8-4 3.8 1 5.4-5-2.7-5 2.7 1-5.4-4-3.8 5.5-.8z" fill="#ffd23f"/>
+<circle cx="8" cy="24" r="7" fill="#6b3f1d"/><circle cx="52" cy="24" r="7" fill="#6b3f1d"/>
+<circle cx="30" cy="26" r="19" fill="#ffcf9f"/>
+<path d="M10 26Q10 5 30 5Q50 5 50 26Q42 12 30 14Q18 12 10 26Z" fill="#6b3f1d"/>
+<circle cx="14" cy="9" r="5" fill="#ff5fa2"/><circle cx="46" cy="9" r="5" fill="#ff5fa2"/>
+${eyes(28)}<path class="brow" d="M16 17Q22 12 28 17M32 17Q38 12 44 17" stroke="#6b3f1d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<circle cx="15" cy="36" r="3.5" fill="#ff9aa8" opacity=".7"/><circle cx="45" cy="36" r="3.5" fill="#ff9aa8" opacity=".7"/>
+<path class="mouth" d="M23 38Q30 45 37 38" stroke="#b5453a" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse class="mouth-o" cx="30" cy="40" rx="4.5" ry="5.5" fill="#8a2f2f"/>`;
+const MAYOR=`<g class="leg l"><rect x="19" y="72" width="10" height="28" rx="5" fill="#2f2f4a"/><ellipse cx="23" cy="103" rx="9" ry="5" fill="#222"/></g>
+<g class="leg r"><rect x="31" y="72" width="10" height="28" rx="5" fill="#2f2f4a"/><ellipse cx="37" cy="103" rx="9" ry="5" fill="#222"/></g>
+<g class="arm l"><rect x="7" y="46" width="9" height="26" rx="4.5" fill="#3b4cca"/><circle cx="11.5" cy="74" r="5" fill="#f5c49a"/></g>
+<g class="arm r"><rect x="44" y="46" width="9" height="26" rx="4.5" fill="#3b4cca"/><circle cx="48.5" cy="74" r="5" fill="#f5c49a"/></g>
+<rect x="14" y="44" width="32" height="36" rx="12" fill="#3b4cca"/><path d="M24 44L30 62L36 44Z" fill="#fff"/>
+<path d="M16 50L40 78" stroke="#ffd23f" stroke-width="5" stroke-linecap="round"/><path d="M24 46l6 3-6 3zM36 46l-6 3 6 3z" fill="#e63946"/>
+<circle cx="12" cy="26" r="6" fill="#eee"/><circle cx="48" cy="26" r="6" fill="#eee"/><circle cx="30" cy="26" r="19" fill="#f5c49a"/>
+${eyes(24)}<path class="brow" d="M15 15L26 19M45 15L34 19" stroke="#999" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M20 36Q30 31 40 36Q36 43 30 39Q24 43 20 36Z" fill="#fff" stroke="#ccc"/>
+<path class="mouth" d="M26 42Q30 46 34 42" stroke="#b5453a" stroke-width="2" fill="none" stroke-linecap="round"/><path class="frown" d="M26 47Q30 42 34 47" stroke="#b5453a" stroke-width="2" fill="none" stroke-linecap="round"/><path class="sweat" d="M54 8Q58 16 54 20Q50 16 54 8Z" fill="#7fd0ff"/>`;
+document.querySelectorAll('svg.kid').forEach(s=>s.innerHTML=KID);
+document.querySelectorAll('svg.mayor').forEach(s=>s.innerHTML=MAYOR);
+
+/* ---------- NAVIGATION ---------- */
+const LV=[[1,9,'Level 1: The Square'],[10,15,'Level 2: The Missing Magic Wheel'],[16,22,'Level 3: Triangle Mountain']];
+const hooks={};
+function buildDots(n=1){
+  const L=LV.find(l=>n>=l[0]&&n<=l[1]),d=document.getElementById('dots');d.innerHTML='';
+  document.querySelector('header p').textContent='Mia’s Shape Adventure — '+L[2];
+  for(let i=L[0];i<=L[1];i++){const s=document.createElement('span');s.className='dot'+(i===n?' on':'');d.appendChild(s)}
+}
+function go(n){
+  document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s'+n).classList.add('active');
+  buildDots(n);window.scrollTo({top:0,behavior:'smooth'});
+  const t=document.querySelector('#s'+n+' .bubble');if(t)speak(t.textContent);
+  hooks[n]&&hooks[n]();
+}
+
+/* ---------- SOUND ---------- */
+let soundOn=true;
+document.getElementById('soundBtn').onclick=function(){
+  soundOn=!soundOn;this.textContent=soundOn?'🔊':'🔇';
+  if(!soundOn&&window.speechSynthesis)speechSynthesis.cancel();
+};
+function speak(t){
+  if(!soundOn||!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t.replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu,''));
+  u.rate=.9;u.pitch=1.25;speechSynthesis.speak(u);
+}
+
+/* ---------- SCENE ACTIONS ---------- */
+function miaWalk(){
+  const w=document.getElementById('walker'),btn=document.getElementById('walkBtn'),door=document.getElementById('door'),st=w.parentElement;
+  btn.disabled=true;btn.textContent='Walking… 👣';w.classList.add('walk');
+  const iv=setInterval(()=>{const p=document.createElement('span');p.className='step';p.style.left=(w.offsetLeft+18)+'px';st.appendChild(p);setTimeout(()=>p.remove(),700)},240);
+  setTimeout(()=>{clearInterval(iv);w.classList.remove('walk');w.style.left='calc(55% - 41px)';btn.textContent='Knock, knock… 🚪'},2000);
+  setTimeout(()=>{door.classList.add('open');btn.textContent='The door opens! ✨'},2500);
+  setTimeout(()=>{go(3);btn.disabled=false;btn.textContent='Walk, Mia! 👣';w.style.left='';door.classList.remove('open')},4300);
+}
+function sparkle(el){
+  const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<8;i++){const s=document.createElement('span');s.className='spark';s.textContent=i%2?'✨':'⭐';
+    const a=i/8*6.283;s.style.left=cx+'px';s.style.top=cy+'px';s.style.setProperty('--dx',Math.cos(a)*60+'px');s.style.setProperty('--dy',Math.sin(a)*60+'px');
+    document.body.appendChild(s);setTimeout(()=>s.remove(),800)}
+}
+function surprise(id){const k=document.getElementById(id);k.classList.add('surprised');setTimeout(()=>k.classList.remove('surprised'),2500)}
+function showClue(id,html){const b=document.getElementById(id);b.innerHTML=html;b.classList.add('card');b.classList.remove('unfold');void b.offsetWidth;b.classList.add('unfold')}
+function foundFrame(el){sparkle(el);setTimeout(()=>go(7),700)}
+function clue1(){
+  const n=document.getElementById('note1');sparkle(n);n.style.display='none';document.getElementById('lens4').style.display='none';surprise('kid4');
+  showClue('bubble4','<span class="speaker">Clue 1:</span> 📜 “Look for something with <b>four sides</b>. It holds a special memory.”');
+  speak('Clue 1. Look for something with four sides. It holds a special memory.');
+  document.getElementById('next4').style.display='inline-block';
+}
+function clue2(){
+  const n=document.getElementById('note2');sparkle(n);n.style.display='none';document.getElementById('lens5').style.display='none';surprise('kid5');
+  showClue('bubble5','<span class="speaker">Clue 2:</span> 📝 “The missing photograph has <b>four equal sides</b> and <b>four corners</b>!”');
+  speak('Clue 2. The missing photograph has four equal sides and four corners!');
+  document.getElementById('next5').style.display='inline-block';
+}
+
+/* ---------- SQUARE LESSON ---------- */
+const $c=id=>document.getElementById(id);
+const qa=sel=>[...document.querySelectorAll('#sqSvg '+sel)];
+function chips(){$c('chips').innerHTML=''}
+function chip(text,color){const s=document.createElement('span');s.className='side-chip';s.style.background=color;s.textContent=text;$c('chips').appendChild(s)}
+function drawSides(){chips();qa('.side').forEach((e,i)=>{setTimeout(()=>{e.classList.add('draw');chip('Side '+(i+1),'#e63946')},i*800);setTimeout(()=>e.classList.add('done'),i*800+750)})}
+function showEqual(){chips();qa('.tick').forEach((t,i)=>setTimeout(()=>t.classList.add('show'),i*350));setTimeout(()=>{$c('eq').classList.add('show');chip('4 equal sides','#2563eb')},1400)}
+function popCorners(){chips();qa('.corner').forEach((c,i)=>setTimeout(()=>{c.classList.add('pop');chip('Corner '+(i+1),'#c2410c')},i*500))}
+function showRight(){chips();qa('.ra').forEach((r,i)=>setTimeout(()=>r.classList.add('show'),i*450));setTimeout(()=>chip('4 right angles','#047857'),1800)}
+function showName(){chips();$c('fillRect').classList.add('show');$c('sqName').classList.add('show');$c('next7').style.display='inline-block'}
+const lessonSteps=[
+  {d:0,t:'Let’s look at the photo frame’s shape!'},
+  {d:1500,t:'It has four sides! Watch me draw them, one at a time!',f:drawSides},
+  {d:5600,t:'All four sides are EQUAL. See the little marks? Same length!',f:showEqual},
+  {d:8600,t:'It has four corners! One… two… three… four!',f:popCorners},
+  {d:11400,t:'Every corner is a square corner. We call it a right angle!',f:showRight},
+  {d:14400,t:'This shape is called a… SQUARE!',f:showName},
+];
+function startLesson(){
+  $c('lessonBtn').style.display='none';
+  lessonSteps.forEach(st=>setTimeout(()=>{$c('bubble7').innerHTML='<span class="speaker">Mia:</span> '+st.t;speak(st.t);st.f&&st.f()},st.d));
+}
+
+/* ---------- QUIZ ---------- */
+const questions=[
+  {q:'How many sides does a square have?',type:'choice',opts:[['3 sides',false],['4 sides',true],['5 sides',false]]},
+  {q:'How many corners does a square have?',type:'choice',opts:[['2 corners',false],['3 corners',false],['4 corners',true]]},
+  {q:'Tap the SQUARE!',type:'shapes'},
+];
+const SHAPES={
+  square:'<rect x="15" y="15" width="70" height="70" rx="6" fill="#ff5fa2"/>',
+  circle:'<circle cx="50" cy="50" r="40" fill="#46c46b"/>',
+  triangle:'<polygon points="50,10 92,88 8,88" fill="#ffb300"/>',
+  rectangle:'<rect x="5" y="28" width="90" height="44" rx="6" fill="#3d9bff"/>'
+};
+let qi=0;
+let wrongQ=false,score=0,gold=0;
+function addStar(){const g=!wrongQ;if(g)gold++;score++;$c('stars').insertAdjacentHTML('beforeend','<span class="sstar'+(g?'':' silver')+'">⭐</span>');const n=$c('num');n.textContent=score;n.classList.remove('bump');void n.offsetWidth;n.classList.add('bump');$c('fs').textContent='You won '+gold+' gold star'+(gold===1?'':'s')+' out of 3!'}
+function renderQuestion(){wrongQ=false;
+  const box=document.getElementById('quizBox'),Q=questions[qi];
+  document.getElementById('quizNext').style.display='none';
+  box.innerHTML='<span class="speaker">Mia asks:</span> '+Q.q;
+  if(Q.type==='choice'){
+    Q.opts.forEach(([label,ok])=>{
+      const b=document.createElement('button');b.className='quiz-opt';b.textContent=label;
+      b.onclick=()=>{
+        if(ok){
+          document.querySelectorAll('#quizBox .quiz-opt').forEach(o=>o.disabled=true);
+          b.classList.add('correct','jump');sparkle(b);addStar();box.insertAdjacentHTML('beforeend','<br>✅ <b>Correct! You are so smart!</b>');
+          speak('Correct! Amazing!');document.getElementById('quizNext').style.display='block';
+        }else{
+          wrongQ=true;b.classList.add('wrong');b.disabled=true;speak('Try again! Count carefully.');
+        }
+      };
+      box.appendChild(b);
+    });
+  }else{
+    const row=document.createElement('div');row.className='shape-row';
+    Object.keys(SHAPES).sort(()=>Math.random()-.5).forEach(k=>{
+      const c=document.createElement('button');c.className='shape-card';c.setAttribute('aria-label',k);
+      c.innerHTML='<svg viewBox="0 0 100 100">'+SHAPES[k]+'</svg>';
+      c.onclick=()=>{
+        if(k==='square'){c.style.background='#8fd05f';c.classList.add('jump');sparkle(c);addStar();box.insertAdjacentHTML('beforeend','<br>✅ <b>Yes! That is a square!</b>');speak('Yes! That is a square!');document.getElementById('quizNext').style.display='block'}
+        else{wrongQ=true;c.style.animation='shake .4s';setTimeout(()=>c.style.animation='',400);speak('Look for four equal sides!')}
+      };
+      row.appendChild(c);
+    });
+    box.appendChild(row);
+  }
+  speak(Q.q);
+}
+function nextQuestion(){
+  qi++;
+  if(qi>=questions.length){go(9);confettiBurst();return}
+  renderQuestion();
+}
+function confettiBurst(){
+  const em=['🎉','⭐','🔷','🟧','✨'];
+  for(let i=0;i<40;i++){
+    const s=document.createElement('span');s.className='confetti';s.textContent=em[i%em.length];
+    s.style.left=Math.random()*100+'vw';s.style.animationDuration=(2+Math.random()*2)+'s';
+    s.style.animationDelay=(Math.random()*1.5)+'s';s.style.fontSize=(1+Math.random()*1.5)+'rem';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),5500);
+  }
+}
+renderQuestion();
+buildDots();
+
+/* ================= LEVELS 2 & 3 ================= */
+const T=(f,ms)=>setTimeout(f,ms);
+const add=(id,c)=>$c(id).classList.add(c);
+const sv=id=>`<svg viewBox="0 0 50 50"><use href="#${id}"/></svg>`;
+function say(id,html){const b=$c(id);b.innerHTML=html;speak(b.textContent)}
+function mood(id,c,ms){const k=$c(id);if(!k)return;k.classList.add(c);if(ms)T(()=>k.classList.remove(c),ms)}
+function cchip(row,t,c){const s=document.createElement('span');s.className='side-chip';s.style.background=c;s.textContent=t;$c(row).appendChild(s)}
+function lesson(steps,bid,btn){$c(btn).style.display='none';steps.forEach(s=>T(()=>{$c(bid).innerHTML='<span class="speaker">Mia:</span> '+s.t;speak(s.t);s.f&&s.f()},s.d))}
+
+/* --- Level 2 --- */
+hooks[10]=()=>{
+  const w=$c('wr10'),c=$c('cart10');w.classList.remove('away');c.classList.remove('broken');
+  T(()=>$c('k10').parentElement.classList.remove('walk','enter'),1900);
+  T(()=>w.classList.add('away'),3200);T(()=>c.classList.add('broken'),3700);
+};
+function probe(kind,el){
+  if(kind==='gold'){
+    sparkle(el);el.classList.add('win');mood('k11','happy',1500);
+    say('bubble11','<span class="speaker">Mia:</span> It glows and rolls! This round golden wheel is the missing wheel! 🎉');
+    $c('next11').style.display='inline-block';return;
+  }
+  el.classList.remove('no');void el.offsetWidth;el.classList.add('no');mood('k11','worried',1500);
+  say('bubble11','<span class="speaker">Mia:</span> '+(kind==='box'?'This is a square gift box.':'This is a triangle garden sign.')+' Wheels don’t look like that. Try another!');
+}
+const ciSteps=[
+  {d:0,t:'First, a tiny dot appears…',f:()=>add('ciDot','pop')},
+  {d:2200,t:'Now a curved line starts to draw… round and round!',f:()=>add('ciRing','draw')},
+  {d:5000,t:'The circle completes itself! It has ONE continuous curved boundary.',f:()=>{add('ciFill','show');add('ciPtr','go');cchip('ciChips','1 curved boundary','#2563eb')}},
+  {d:9200,t:'A circle can roll and rotate, round and round!',f:()=>{add('ciSpin','show');add('ciSpin','rot')}},
+  {d:12800,t:'Look at the edge. Are there any corners? No corners at all!',f:()=>cchip('ciChips','0 corners','#c2410c')},
+  {d:15800,t:'This shape is called a… CIRCLE!',f:()=>{add('ciName','show');$c('next12').style.display='inline-block'}}
+];
+function collect(rowId,items,bid,k,shape,doneMsg,nextId){
+  const row=$c(rowId);let n=0;
+  items.forEach(([vis,label])=>{
+    const b=document.createElement('button');b.className='pick';
+    b.innerHTML=`<span class="pv">${vis}</span><span class="pl">${label}</span>`;
+    b.onclick=()=>{
+      if(b.classList.contains('found'))return;
+      b.classList.add('found','jump');sparkle(b);n++;mood(k,'happy',900);
+      if(n===items.length){say(bid,doneMsg);$c(nextId).style.display='inline-block'}
+      else say(bid,`<span class="speaker">Mia:</span> Yes! The ${label.toLowerCase()} has a ${shape} shape!`);
+    };
+    row.appendChild(b);
+  });
+}
+const DET=[['p-clock',1],['p-wheel',1],['p-coin',1],['p-plate',1],['p-box',0],['p-sign',0],['p-frame',0],['p-book',0]];
+let detTimer,detFound;
+function endDet(){clearInterval(detTimer);document.querySelectorAll('#detRow .shape-card').forEach(c=>c.dataset.d=1)}
+function startDet(){
+  clearInterval(detTimer);const row=$c('detRow'),bar=$c('detBar');
+  $c('detGo').style.display='none';row.innerHTML='';detFound=0;bar.style.width='100%';bar.parentElement.style.display='block';
+  say('bubble14','<span class="speaker">Mia:</span> Go, go, go! Find the 4 circles!');
+  DET.slice().sort(()=>Math.random()-.5).forEach(([id,ok])=>{
+    const b=document.createElement('button');b.className='shape-card';b.dataset.ok=ok;b.innerHTML=sv(id);
+    b.onclick=()=>{
+      if(b.dataset.d)return;
+      if(ok){
+        b.dataset.d=1;b.classList.add('glow-ok','jump');sparkle(b);detFound++;mood('k14','happy',800);
+        if(detFound===4){
+          endDet();confettiBurst();say('bubble14','<span class="speaker">Mia:</span> Hooray! You found all the circles in time! 🎉');$c('next14').style.display='inline-block';
+        }else speak('Yes! A circle!');
+      }else{
+        b.style.animation='shake .4s';T(()=>b.style.animation='',400);mood('k14','worried',1500);
+        say('bubble14','<span class="speaker">Mia:</span> Hmm, that one has corners. A circle is round with no corners!');
+      }
+    };
+    row.appendChild(b);
+  });
+  const t0=Date.now(),D=25000;
+  detTimer=setInterval(()=>{
+    const p=1-(Date.now()-t0)/D;bar.style.width=Math.max(0,p*100)+'%';
+    if(p<=0){
+      endDet();row.querySelectorAll('.shape-card').forEach(c=>{if(c.dataset.ok==='1')c.classList.add('glow-ok')});
+      say('bubble14','<span class="speaker">Mia:</span> Time’s up! The glowing ones are the circles. Let’s try again!');
+      $c('detGo').textContent='Try again 🔁';$c('detGo').style.display='inline-block';
+    }
+  },100);
+}
+hooks[15]=confettiBurst;
+
+/* --- Level 3 --- */
+hooks[16]=()=>{
+  const sc=$c('sc16'),card=$c('scrollCard'),nx=$c('next16');
+  sc.style.display='none';card.style.display='none';nx.style.display='none';sc.classList.remove('drop');
+  T(()=>{sc.style.display='block';sc.classList.add('drop')},2300);
+  T(()=>{sc.style.display='none';card.style.display='block';nx.style.display='inline-block'},3500);
+};
+function connectGame(stId,guided,done,hint){
+  const st=$c(stId),svg=st.querySelector('.lines'),dots=[...st.querySelectorAll('.cdot')];
+  const P=dots.map(d=>[+d.dataset.x,+d.dataset.y]),NS='http://www.w3.org/2000/svg';let seq=[],busy=false;
+  const draw=(a,b)=>{const p=document.createElementNS(NS,'path');p.setAttribute('d',`M${P[a][0]} ${P[a][1]}L${P[b][0]} ${P[b][1]}`);p.setAttribute('pathLength','1');svg.appendChild(p)};
+  const mark=()=>{dots.forEach(d=>d.classList.remove('next'));if(guided&&seq.length<3)dots[seq.length].classList.add('next');if(!guided&&seq.length===3)dots[seq[0]].classList.add('next')};
+  const finish=()=>{busy=true;draw(seq[2],seq[0]);dots.forEach(d=>{d.classList.remove('next');d.classList.add('lit')});T(()=>{svg.querySelector('.tri-fill').classList.add('show');done()},600)};
+  const bad=(i,m)=>{const d=dots[i];d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake');hint(m)};
+  const take=i=>{seq.push(i);dots[i].classList.add('picked');if(seq.length>1)draw(seq[seq.length-2],i);mark()};
+  dots.forEach((d,i)=>d.onclick=()=>{
+    if(busy)return;
+    if(guided){if(i!==seq.length)return bad(i,'Tap the glowing stone with number '+(seq.length+1)+'!');take(i);if(seq.length===3)T(finish,500);return}
+    if(seq.length===3){if(i===seq[0])finish();else bad(i,'Now tap the first dot again to close the shape!');return}
+    if(seq.includes(i))return bad(i,i===seq[0]&&seq.length<3?'A triangle needs three corners! Connect the third dot first.':'Pick a different dot!');
+    take(i);if(seq.length===3)hint('Great! Now tap the first dot again to close the shape.',1);
+  });
+  mark();
+}
+const hintFn=(bid,who,k)=>(m,ok)=>{say(bid,`<span class="speaker">${who}:</span> ${m}`);if(!ok)mood(k,'worried',1800)};
+const trq=s=>[...$c('trSvg').querySelectorAll(s)];
+const trSteps=[
+  {d:0,t:'Look at the shape the stones made!'},
+  {d:1500,t:'First side… second side… third side! Three straight sides!',f:()=>trq('.side').forEach((e,i)=>{T(()=>{e.classList.add('draw');cchip('trChips','Side '+(i+1),'#e63946')},i*800);T(()=>e.classList.add('done'),i*800+750)})},
+  {d:5200,t:'Now watch the corners light up, one by one!',f:()=>{$c('trChips').innerHTML='';trq('.corner').forEach((c,i)=>T(()=>{c.classList.add('pop');cchip('trChips','Corner '+(i+1),'#c2410c')},i*600))}},
+  {d:8500,t:'Three straight sides and three corners!',f:()=>{add('trFill','show');add('trSvg','wob')}},
+  {d:11000,t:'This shape is called a… TRIANGLE!',f:()=>{add('trName','show');$c('next18').style.display='inline-block'}}
+];
+hooks[22]=confettiBurst;
+
+/* --- Tangram lock (7 blocks build a square) --- */
+let tanP=[];
+function tanHint(){
+  const o=tanP.find(p=>!p.done);if(!o)return;
+  [o.g,$c('slot'+o.id)].forEach(e=>{e.classList.remove('hint');void e.getBoundingClientRect();e.classList.add('hint');T(()=>e.classList.remove('hint'),1700)});
+  say('bubble21','<span class="speaker">Mia:</span> Look at the blinking block and its dotted shape. Drag it there! 👆');
+}
+function tanInit(){
+  const U=6,BX=41,BY=4,NS='http://www.w3.org/2000/svg',svg=$c('tanSvg');
+  const defs=[
+    ['A',[[0,0],[8,0],[4,4]],'#e63946',[32,58]],
+    ['B',[[0,0],[0,8],[4,4]],'#3d9bff',[4,58]],
+    ['C',[[8,0],[8,4],[6,2]],'#ffb703',[112,58]],
+    ['D',[[4,4],[6,6],[2,6]],'#ff8fab',[104,92]],
+    ['E',[[4,4],[6,2],[8,4],[6,6]],'#46c46b',[32,86]],
+    ['F',[[8,4],[8,8],[4,8]],'#7b5cd6',[80,58]],
+    ['G',[[0,8],[4,8],[6,6],[2,6]],'#ff7a59',[62,92]]
+  ];
+  const sc=([x,y])=>[BX+x*U,BY+y*U],pts=a=>a.map(p=>sc(p).join(',')).join(' ');
+  const mk=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e};
+  defs.forEach(d=>svg.appendChild(mk('polygon',{points:pts(d[1]),class:'tslot',id:'slot'+d[0]})));
+  let placed=0;
+  const toSvg=e=>new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+  defs.forEach(d=>{
+    const g=mk('g',{class:'tpiece'});g.appendChild(mk('polygon',{points:pts(d[1]),fill:d[2]}));
+    const xs=d[1].map(p=>sc(p)[0]),ys=d[1].map(p=>sc(p)[1]);
+    const o={id:d[0],g,done:false,ox:d[3][0]-Math.min(...xs),oy:d[3][1]-Math.min(...ys)};
+    const top=Math.min(...ys),set=()=>g.setAttribute('transform','translate('+o.ox+' '+o.oy+')');set();
+    g.addEventListener('pointerdown',e=>{
+      if(o.done)return;e.preventDefault();svg.appendChild(g);g.classList.add('lift');
+      const p=toSvg(e),dx=p.x-o.ox,dy=p.y-o.oy;
+      const mv=ev=>{const q=toSvg(ev);o.ox=q.x-dx;o.oy=q.y-dy;set()};
+      const up=()=>{
+        removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+        g.classList.remove('lift');
+        if(Math.abs(o.ox)<6&&Math.abs(o.oy)<6){
+          o.ox=0;o.oy=0;set();o.done=true;g.classList.add('done');$c('slot'+o.id).classList.add('filled');
+          placed++;$c('tanCount').textContent=placed;sparkle(g.querySelector('polygon'));
+          if(placed===7){
+            svg.classList.add('win');confettiBurst();
+            say('bubble21','<span class="speaker">Mia:</span> Click! The lock opens! You built a big SQUARE from triangles, a square and a parallelogram! 🎉');
+            $c('tanNext').style.display='inline-block';
+          }else speak('Great! It fits!');
+        }else if(top+o.oy<50){
+          say('bubble21','<span class="speaker">Mia:</span> Not quite here. Match the block to the dotted shape with the same corners!');
+        }
+      };
+      addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+    });
+    svg.appendChild(g);tanP.push(o);
+  });
+}
+tanInit();
+
+/* --- init --- */
+collect('row13',[[sv('p-clock'),'Clock'],[sv('p-coin'),'Coin'],[sv('p-wheel'),'Wheel'],[sv('p-plate'),'Plate']],'bubble13','k13','circle','<span class="speaker">Mia:</span> Amazing! All these objects have a circular shape!','next13');
+collect('row19',[['⛰️','Mountain'],['🏠','Roof'],['⚠️','Road sign'],['🍕','Pizza slice']],'bubble19','k19','triangle','<span class="speaker">Mia:</span> Wonderful! You found triangles in everyday life!','next19');
+connectGame('st17',true,()=>{say('bubble17','<span class="speaker">Mia:</span> Look! We made a triangle! 🔺');mood('k17','happy',1500);sparkle($c('st17'));$c('next17').style.display='inline-block'},hintFn('bubble17','Tiki','k17'));
+connectGame('st20',false,()=>{$c('gate20').classList.add('open');say('bubble20','<span class="speaker">Mia:</span> Three corners glow, and the gate opens! 🎉');mood('k20','happy',2500);T(()=>go(21),2800)},hintFn('bubble20','Mia','k20'));
+</script>
+</body>
+</html>
